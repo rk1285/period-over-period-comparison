@@ -29,7 +29,7 @@ WHEN report_date BETWEEN $PERIOD_1_START AND $PERIOD_1_END THEN 'P1'
 WHEN report_date BETWEEN $PERIOD_2_START AND $PERIOD_2_END THEN 'P2'
 END AS period
 
-FROM 'C:\Users\E0668055\OneDrive - RS Group plc\Python Scripts\period-over-period-comparison\data\raw\synthetic_seo_snow_rock_dataset_v3.csv'
+FROM '\data\raw\synthetic_seo_snow_rock_dataset_v3.csv'
 
 WHERE
 (
