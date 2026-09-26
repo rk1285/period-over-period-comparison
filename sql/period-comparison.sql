@@ -1,18 +1,3 @@
-/* ==========================================
-USER INPUTS (DuckDB Variable Syntax)
-========================================== */
-
-SET VARIABLE period_1_start = '2025-02-01';
-SET VARIABLE period_1_end   = '2025-04-30';
-
-SET VARIABLE period_2_start = '2026-02-01';
-SET VARIABLE period_2_end   = '2026-04-30';
-
-
-/* ==========================================
-PERIOD COMPARISON ANALYSIS
-========================================== */
-
 WITH labelled AS (
 
     SELECT
@@ -21,171 +6,88 @@ WITH labelled AS (
         page,
         clicks,
         impressions,
-        position,
+        average_position,
 
         CASE
-            WHEN report_date BETWEEN getvariable('period_1_start')::DATE AND getvariable('period_1_end')::DATE THEN 'P1'
-            WHEN report_date BETWEEN getvariable('period_2_start')::DATE AND getvariable('period_2_end')::DATE THEN 'P2'
+            WHEN report_date BETWEEN $1::DATE AND $2::DATE THEN 'P1'
+            WHEN report_date BETWEEN $3::DATE AND $4::DATE THEN 'P2'
         END AS period
 
     FROM 'data/raw/synthetic_seo_snow_rock_dataset_v3.csv'
 
     WHERE
-        report_date BETWEEN getvariable('period_1_start')::DATE AND getvariable('period_1_end')::DATE
+        report_date BETWEEN $1::DATE AND $2::DATE
         OR
-        report_date BETWEEN getvariable('period_2_start')::DATE AND getvariable('period_2_end')::DATE
+        report_date BETWEEN $3::DATE AND $4::DATE
 
 ),
 
-/* ==========================================
-AGGREGATED PERFORMANCE
-========================================== */
-
 agg AS (
-
     SELECT
         market,
         keyword,
         page,
 
-        /* Clicks */
         SUM(CASE WHEN period = 'P1' THEN clicks ELSE 0 END) AS clicks_p1,
         SUM(CASE WHEN period = 'P2' THEN clicks ELSE 0 END) AS clicks_p2,
 
-        /* Impressions */
         SUM(CASE WHEN period = 'P1' THEN impressions ELSE 0 END) AS impressions_p1,
         SUM(CASE WHEN period = 'P2' THEN impressions ELSE 0 END) AS impressions_p2,
 
-        /* Weighted Average Position */
-        SUM(
-            CASE
-                WHEN period = 'P1'
-                THEN position * impressions
-            END
-        )
-        /
-        NULLIF(
-            SUM(
-                CASE
-                    WHEN period = 'P1'
-                    THEN impressions
-                END
-            ),
-            0) AS avg_position_p1,
+        SUM(CASE WHEN period = 'P1' THEN average_position * impressions END) 
+            / NULLIF(SUM(CASE WHEN period = 'P1' THEN impressions END), 0) AS avg_position_p1,
 
-        SUM(
-            CASE
-                WHEN period = 'P2'
-                THEN position * impressions
-            END
-        )
-        /
-        NULLIF(
-            SUM(
-                CASE
-                    WHEN period = 'P2'
-                    THEN impressions
-                END
-            ),
-            0) AS avg_position_p2
+        SUM(CASE WHEN period = 'P2' THEN average_position * impressions END) 
+            / NULLIF(SUM(CASE WHEN period = 'P2' THEN impressions END), 0) AS avg_position_p2
 
     FROM labelled
-
     WHERE period IS NOT NULL
-
-    GROUP BY
-        market,
-        keyword,
-        page
-
+    GROUP BY market, keyword, page
 ),
-
-/* ==========================================
-CHANGE CALCULATIONS
-========================================== */
 
 changes AS (
-
     SELECT
         *,
-
-        /* Absolute Click Change */
         clicks_p2 - clicks_p1 AS clicks_diff,
-
-        /* Percentage Click Change */
-        ROUND(
-            (clicks_p2 - clicks_p1)
-            / NULLIF(clicks_p1, 0)
-        , 4) AS clicks_pct_change,
-
-        /* Absolute Impression Change */
+        ROUND((clicks_p2 - clicks_p1) / NULLIF(clicks_p1, 0), 4) AS clicks_pct_change,
         impressions_p2 - impressions_p1 AS impressions_diff,
-
-        /* Percentage Impression Change */
-        ROUND(
-            (impressions_p2 - impressions_p1)
-            / NULLIF(impressions_p1, 0)
-        , 4) AS impressions_pct_change,
-
-        /* Position Movement */
-        ROUND(
-            avg_position_p2 - avg_position_p1
-        , 2) AS position_diff
-
+        ROUND((impressions_p2 - impressions_p1) / NULLIF(impressions_p1, 0), 4) AS impressions_pct_change,
+        ROUND(avg_position_p2 - avg_position_p1, 2) AS position_diff
     FROM agg
-
 ),
 
-/* ==========================================
-CONTRIBUTION ANALYSIS
-========================================== */
-
 contribution AS (
-
     SELECT
         *,
-
         SUM(clicks_diff) OVER() AS total_click_change,
-
         ROUND(clicks_diff / NULLIF(SUM(clicks_diff) OVER(), 0), 4) AS contribution_pct
-
     FROM changes
-
 )
-
-/* ==========================================
-FINAL OUTPUT
-========================================== */
 
 SELECT
     market,
     keyword,
     page,
 
-    CONCAT(getvariable('period_1_start'), ' to ', getvariable('period_1_end')) AS period_1,
-    CONCAT(getvariable('period_2_start'), ' to ', getvariable('period_2_end')) AS period_2,
+    CONCAT($1, ' to ', $2) AS period_1,
+    CONCAT($3, ' to ', $4) AS period_2,
 
-    /* Click Metrics */
     clicks_p1,
     clicks_p2,
     clicks_diff,
     clicks_pct_change,
 
-    /* Impression Metrics */
     impressions_p1,
     impressions_p2,
     impressions_diff,
     impressions_pct_change,
 
-    /* Visibility Metrics */
     avg_position_p1,
     avg_position_p2,
     position_diff,
 
-    /* Growth Contribution */
     contribution_pct,
 
-    /* Trend Classification */
     CASE
         WHEN clicks_pct_change >= 0.50 THEN 'Exceptional Growth'
         WHEN clicks_pct_change >= 0.20 THEN 'Strong Growth'
@@ -196,10 +98,8 @@ SELECT
         ELSE 'Flat'
     END AS trend,
 
-    /* Impact Score */
     ROUND(ABS(clicks_diff) * (1 + ABS(COALESCE(clicks_pct_change, 0))), 2) AS impact_score,
 
-    /* Flags */
     CASE
         WHEN clicks_diff > 0 AND position_diff < 0 THEN 'Growth + Ranking Improvement'
         WHEN clicks_diff < 0 AND position_diff > 0 THEN 'Traffic Loss + Ranking Decline'
@@ -209,10 +109,5 @@ SELECT
     END AS performance_flag
 
 FROM contribution
-
-WHERE
-    clicks_p1 >= 5 OR clicks_p2 >= 5
-
-ORDER BY
-    market,
-    impact_score DESC;
+WHERE clicks_p1 >= 5 OR clicks_p2 >= 5
+ORDER BY market, impact_score DESC
