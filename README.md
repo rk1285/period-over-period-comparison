@@ -13,7 +13,7 @@ In simple terms, this workflow aims to take Google Search Console data across 2 
 
 With the output file, SEO professionals can utilise the file for priortisation of efforts to recover performance where it has been lost or report on areas of growth where that has been the case.
 
-### Skills demonstrated:
+## Skills demonstrated:
 SQL - 
  - CTE - performing various pre calculations and aggregations with the original source file
  - SELECT, WHERE - specify the data selected and base level of filtering
@@ -21,3 +21,6 @@ SQL -
  - NULLIF - handling null values when dividing i.e in case there are zero clicks but more than zero impressions.
  - GROUP BY - data aggregation
  - CONCAT - concatenating data for the purpose of labelling
+
+## Example conclusions & visualisations
+
