@@ -24,9 +24,7 @@ SQL -
 
 ## Example conclusions & visualisations
 
-### Conclusions & Observations
-
-#### Overall Summary:
+### Overall Summary:
 
  - In all 3 markets, each is exhibiting a decline in performance across the comparative time periods.
  - For the majority of declines, this is explained as traffic loss brought on by a ranking decline.
@@ -34,7 +32,7 @@ SQL -
 
 ![period-over-period-comparison](python/performance_summary_facet_plot.png)
 
-#### Category/Product line Summary:
+### Category/Product line Summary:
 
 The aim is to go a bit deeper into what has driven performance changes and draw conclusions about where effort should be prioritised to address the declines.
 
