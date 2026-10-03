@@ -24,3 +24,5 @@ SQL -
 
 ## Example conclusions & visualisations
 
+
+![period-over-period-comparison](python/perforamnce_summary_facet_plot.png)
