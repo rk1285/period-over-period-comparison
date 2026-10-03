@@ -26,11 +26,21 @@ SQL -
 
 ### Conclusions & Observations
 
+#### Overall Summary:
+
  - In all 3 markets, each is exhibiting a decline in performance across the comparative time periods.
  - For the majority of declines, this is explained as traffic loss brought on by a ranking decline.
  - Interestingly, a portion of circa 25% of the declining performance can be accounted for by a traffic loss but with no decline in position. This warrants further investigation to understand the reasons for the decline if the data shows no ranking change.
 
 ![period-over-period-comparison](python/performance_summary_facet_plot.png)
 
+#### Category/Product line Summary:
+
+The aim is to go a bit deeper into what has driven performance changes and draw conclusions about where effort should be prioritised to address the declines.
+
+Possible Conclusions: Looking at the graph below, the following conclusions could be relevant:
+ - A majority of the declines have been seen in the Snowsports category
+ - Of the snowsports category declines, there is an even split between where traffic lossses have come alongside a ranking decline.
+ - Also within the Snowsports category, a number of declines in clicks have been seen but that has not aligned to a ranking decline. Other factors are likely driving a decline and require further investigation. Such factors could include: ranking cannibalisation, switch in search engine results page features, impacts of technical indexability or crawlability of pages etc.
 
 ![period-over-period-comparison](python/category_summary_facet_plot.png)
