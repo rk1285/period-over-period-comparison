@@ -22,6 +22,10 @@ SQL -
  - GROUP BY - data aggregation
  - CONCAT - concatenating data for the purpose of labelling
 
+Python - 
+- Filtering & grouping/aggregation
+- Visualisation (plotly), facet plot
+
 ## Example conclusions & visualisations
 
 ### Overall Summary:
