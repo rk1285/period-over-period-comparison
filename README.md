@@ -24,5 +24,13 @@ SQL -
 
 ## Example conclusions & visualisations
 
+###Conclusions & Observations
+
+1 - In all 3 markets, each is exhibiting a decline in performance across the comparative time periods.
+2 - For the majority of declines, this is explained as traffic loss brought on by a ranking decline.
+3 - Interestingly, a portion of circa 25% of the declining performance can be accounted for by a traffic loss but with no decline in position. This warrants further investigation to understand the reasons for the decline if the data shows no ranking change.
 
 ![period-over-period-comparison](python/performance_summary_facet_plot.png)
+
+
+![period-over-period-comparison](python/category_summary_facet_plot.png)
